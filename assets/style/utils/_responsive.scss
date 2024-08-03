@@ -1,0 +1,129 @@
+$breakpoints: (
+    'xs': 375px,
+    'sm': 480px,
+    'md': 768px,
+    'lg': 1024px,
+    'xlg': 1280px,
+    'xl': 1440px,
+    'xxl': 1680px,
+    '3xl': 1920px,
+    '4xl': 2560px,
+);
+
+@mixin px-layout {
+    padding-left: 20rem;
+    padding-right: 20rem;
+
+    @include layout-lg {
+        padding-left: 16rem;
+        padding-right: 16rem;
+    }
+}
+
+@mixin mx-layout {
+    margin-left: 20rem;
+    margin-right: 20rem;
+
+    @include layout-lg {
+        margin-left: 16rem;
+        margin-right: 16rem;
+    }
+}
+
+@mixin layout-sm {
+    @media (min-width: #{map-get($breakpoints, 'sm')}) {
+        @content;
+    }
+}
+
+@mixin layout-until-md {
+    @media (max-width: #{map-get($breakpoints, 'md') - 1}) {
+        @content;
+    }
+}
+
+@mixin layout-md {
+    @media (min-width: #{map-get($breakpoints, 'md')}) {
+        @content;
+    }
+}
+
+@mixin layout-lg {
+    @media (min-width: #{map-get($breakpoints, 'lg')}) {
+        @content;
+    }
+}
+
+@mixin layout-until-lg {
+    @media (max-width: #{map-get($breakpoints, 'lg') - 1}) {
+        @content;
+    }
+}
+
+@mixin layout-xlg {
+    @media (min-width: #{map-get($breakpoints, 'xlg')}) {
+        @content;
+    }
+}
+
+@mixin layout-xl {
+    @media (min-width: #{map-get($breakpoints, 'xl')}) {
+        @content;
+    }
+}
+
+@mixin layout-xxl {
+    @media (min-width: #{map-get($breakpoints, 'xxl')}) {
+        @content;
+    }
+}
+
+@mixin layout-3xl {
+    @media (min-width: #{map-get($breakpoints, '3xl')}) {
+        @content;
+    }
+}
+
+@mixin layout-4xl {
+    @media (min-width: #{map-get($breakpoints, '4xl')}) {
+        @content;
+    }
+}
+
+@mixin can-hover {
+    @media (hover: hover) {
+        @content;
+    }
+}
+
+@mixin touchscreen {
+    @media (hover: none) {
+        @content;
+    }
+}
+
+@mixin touch-or-mobile {
+    @media (hover: none) or (max-width: #{map-get($breakpoints, 'md') - 1}) {
+        @content;
+    }
+}
+
+@mixin can-hover-and-desktop {
+    @media (hover: hover) and (min-width: #{map-get($breakpoints, 'lg')}) {
+        @content;
+    }
+}
+
+@mixin orientation($orientation: 'landscape') {
+    @media (orientation: #{$orientation}) {
+        @content;
+    }
+}
+
+@function responsive($value) {
+    @return calc($value * (100vw / 375));
+}
+
+@function responsive-lg($value) {
+    @return calc($value * (100vw / 1440));
+}

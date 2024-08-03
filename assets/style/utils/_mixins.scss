@@ -1,0 +1,10 @@
+@mixin hover-link {
+    transition: color 0.3s $ease-in-sine;
+
+    @include can-hover {
+        &:hover {
+            transition: color 0.6s $ease-out-circ;
+            color: $red;
+        }
+    }
+}

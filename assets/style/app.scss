@@ -1,0 +1,141 @@
+@import "./global/reset.scss";
+@import "./global/fonts.scss";
+@import "./global/layout.scss";
+
+:root {
+    scrollbar-width: none;
+    font-size: 1px;
+
+    @include layout-sm {
+        font-size: calc(100vw / 480);
+    }
+    @include layout-md {
+        font-size: calc(100vw / 768);
+    }
+    @include layout-lg {
+        font-size: calc(100vw / 1280);
+    }
+    @include layout-xlg {
+        font-size: calc(100vw / 1440);
+    }
+    @include layout-3xl {
+        font-size: calc(1920px / 1680);
+    }
+}
+
+html,
+body {
+    height: 100%;
+    width: 100%;
+    overscroll-behavior: none;
+}
+
+body {
+    font-size: 16rem;
+    font-family: "PP Neue Montreal", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+html.lenis,
+html.lenis body {
+    height: auto;
+}
+
+.lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+    overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+    pointer-events: none;
+}
+
+.scale-in-clip-enter-active {
+    transition:
+        opacity 0.3s $ease-out-sine,
+        clip-path 1s $ease-out-expo,
+        transform 1s $ease-out-expo;
+}
+
+.scale-in-clip-leave-active {
+    transition:
+        opacity 0.2s $ease-in-sine 0.2s,
+        clip-path 0.5s $ease-in-sine,
+        transform 0.5s $ease-in-sine;
+}
+
+.scale-in-clip-enter-from {
+    opacity: 0;
+    transform: scale3d(1.2, 1.2, 1);
+    clip-path: inset(25%);
+}
+
+.scale-in-clip-leave-to {
+    opacity: 0;
+    transform: scale3d(0.8, 0.8, 1);
+    clip-path: inset(15%);
+}
+
+.scale-in-clip-enter-to,
+.scale-in-clip-leave-from {
+    opacity: 1;
+    transform: scale3d(1, 1, 1);
+    clip-path: inset(0);
+}
+
+.scale-in-enter-active {
+    transition:
+        opacity 0.3s $ease-out-sine,
+        transform 1s $ease-out-expo;
+}
+
+.scale-in-leave-active {
+    transition:
+        opacity 0.2s $ease-in-sine 0.2s,
+        transform 0.5s $ease-in-sine;
+}
+
+.scale-in-enter-from {
+    opacity: 0;
+    transform: scale3d(0.8, 0.8, 1);
+}
+
+.scale-in-leave-to {
+    opacity: 0;
+    transform: scale3d(0.8, 0.8, 1);
+}
+
+.scale-in-enter-to,
+.scale-in-leave-from {
+    opacity: 1;
+    transform: scale3d(1, 1, 1);
+}
+
+.fade-enter-active {
+    transition: opacity 0.3s $ease-out-sine;
+}
+
+.fade-leave-active {
+    transition: opacity 0.2s $ease-in-sine 0.2s;
+}
+
+.fade-enter-from {
+    opacity: 0;
+}
+
+.fade-leave-to {
+    opacity: 0;
+}
+
+.fade-enter-to,
+.fade-leave-from {
+    opacity: 1;
+}

@@ -1,0 +1,67 @@
+@mixin grid($size, $gutter: 0, $margin: 0) {
+    --grid-size: #{$size};
+
+    @if $gutter {
+        --grid-gutter: #{$gutter};
+    }
+
+    @if $margin {
+        --grid-margin: #{$margin};
+    }
+
+    display: grid;
+    grid-template-columns: repeat(var(--grid-size), 1fr);
+
+    @if $gutter {
+        grid-column-gap: var(--grid-gutter, 0);
+    }
+
+    @if $margin {
+        margin-left: var(--grid-margin);
+        margin-right: var(--grid-margin);
+    }
+}
+
+@mixin grid-mobile($gutter: 10rem, $margin: 20rem) {
+    @include grid(4, $gutter, $margin);
+}
+
+@mixin grid-desktop($gutter: 10rem, $margin: 20rem) {
+    @include grid(12, $gutter, $margin);
+}
+
+@mixin grid-responsive {
+    @include grid-mobile;
+
+    @include layout-lg {
+        @include grid-desktop;
+    }
+}
+
+@mixin grid-responsive-no($gutter: false, $margin: false) {
+    @if $gutter and not $margin {
+        @include grid-mobile($gutter: 0);
+    }
+
+    @if $margin and not $gutter {
+        @include grid-mobile($margin: 0);
+    }
+
+    @if $gutter and $margin {
+        @include grid-mobile(0, 0);
+    }
+
+    @include layout-lg {
+        @if $gutter and not $margin {
+            @include grid-desktop($gutter: 0);
+        }
+
+        @if $margin and not $gutter {
+            @include grid-desktop($margin: 0);
+        }
+
+        @if $gutter and $margin {
+            @include grid-desktop(0, 0);
+        }
+    }
+}

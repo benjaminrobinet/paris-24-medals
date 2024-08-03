@@ -1,0 +1,22 @@
+.px-layout {
+    @include px-layout;
+    width: 100%;
+}
+
+.full__width {
+    width: 100%;
+}
+
+.container {
+    max-width: 100%;
+    @include px-layout;
+}
+
+.lg\:container {
+    max-width: 100%;
+
+    @include layout-lg {
+        padding-left: 16rem;
+        padding-right: 16rem;
+    }
+}
