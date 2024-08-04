@@ -18,7 +18,7 @@
         "@pmndrs/assets": "^1.6.0",
         "@types/three": "^0.167.1",
         "easings-css": "^2.1.1",
-        "gsap": "^3.12.5",
+        "gsap": "npm:@gsap/shockingly@^3.12.5",
         "nuxt": "^3.12.4",
         "postprocessing": "^6.36.0",
         "realism-effects": "^1.1.2",

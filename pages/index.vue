@@ -1,3 +1,5 @@
 <template>
-    <div class="page page-index"></div>
+    <div class="page page-index">
+        <ContinentPicker />
+    </div>
 </template>
