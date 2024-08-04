@@ -9,12 +9,12 @@ import { getApp } from "~/libraries/gl/App";
 
 const canvasEl = ref<HTMLCanvasElement | null>(null);
 
-onMounted(() => {
+onMounted(async () => {
     const app = getApp();
-    app.setup({ el: canvasEl.value! });
-    app.init();
-    app.mounted();
-    app.ready();
+    await app.setup({ el: canvasEl.value! });
+    await app.init();
+    await app.mounted();
+    await app.ready();
 });
 
 onBeforeUnmount(() => {
@@ -31,6 +31,7 @@ onBeforeUnmount(() => {
     left: 0;
     width: 100%;
     height: 100%;
+    // background: black;
 }
 
 .canvas {

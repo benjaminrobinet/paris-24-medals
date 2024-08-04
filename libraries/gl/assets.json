@@ -1,0 +1,9 @@
+{
+    "models": [
+        {
+            "type": "gltf",
+            "key": "medals",
+            "src": "/static/medals-compress.glb"
+        }
+    ]
+}
