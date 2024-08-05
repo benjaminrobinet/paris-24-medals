@@ -74,8 +74,6 @@ export class Renderer extends CoreModule {
             focusDistance: 0.0,
             focalLength: 0.048,
             bokehScale: 2.0,
-            resolutionX: window.window.innerWidth,
-            resolutionY: window.innerHeight,
         });
 
         this.vignette = new VignetteEffect({
@@ -108,10 +106,15 @@ export class Renderer extends CoreModule {
         this.instance.setPixelRatio(this.size.dpr);
 
         this.instance.setSize(this.size.width, this.size.height);
-        this.composer.setSize(this.size.width, this.size.height);
-        this.smaa.setSize(this.size.width, this.size.height);
 
-        this.camera.position.z = 5 * (1 / this.size.ar);
+        this.composer.setSize(this.size.width, this.size.height);
+        this.smaa.setSize(this.size.width * this.size.dpr, this.size.height * this.size.dpr);
+        this.dof.setSize(this.size.width * this.size.dpr, this.size.height * this.size.dpr);
+        this.bloom.setSize(this.size.width * this.size.dpr, this.size.height * this.size.dpr);
+        this.vignette.setSize(this.size.width * this.size.dpr, this.size.height * this.size.dpr);
+        this.toneMapping.setSize(this.size.width * this.size.dpr, this.size.height * this.size.dpr);
+
+        this.camera.position.z = this.size.ar > 1 ? 5 / this.size.ar : 5;
         this.camera.aspect = this.app.el!.offsetWidth / this.app.el!.offsetHeight;
         this.camera.updateProjectionMatrix();
     };

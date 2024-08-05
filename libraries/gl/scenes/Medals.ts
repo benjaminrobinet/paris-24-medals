@@ -17,11 +17,11 @@ export class Medals extends Scene {
         this.instance.add(light);
         this.instance.add(light2);
         this.instance.add(light3);
-        this.app.modules.assets!.assets.models.medals.children.forEach((obj, i) => {
-            obj.position.z = -(this.app.modules.assets!.assets.models.medals.children.length - 1 + i * 2);
-            obj.position.x = i * 0.5;
-        });
-        this.instance.add(this.app.modules.assets!.assets.models.medals);
+        // this.app.modules.assets!.assets.models.medals.children.forEach((obj, i) => {
+        //     obj.position.z = -(this.app.modules.assets!.assets.models.medals.children.length - 1 + i * 2);
+        //     obj.position.x = i * 0.5;
+        // });
+        // this.instance.add(this.app.modules.assets!.assets.models.medals);
 
         this.instance.environment = this.app.modules.assets!.assets.envMap.default;
     }

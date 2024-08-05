@@ -41,6 +41,8 @@ export class Debug extends CoreModule {
         this.app.scenes.olympics.items.forEach((item) => {
             this.pane.addBinding(item.cylinderObject.material, "color", { min: 0, max: 5, step: 0.001, color: { type: "float" } });
         });
+
+        this.pane.addBinding(this.app.scenes.olympics.instance, "background", { color: { type: "float" } });
     }
 
     onResize: ViewportHandler = () => {};

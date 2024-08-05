@@ -1,11 +1,10 @@
-import { Group, HemisphereLight, Mesh, MeshPhysicalMaterial, Object3D, RectAreaLight, Vector3 } from "three";
-import { AmbientLight, Color, DirectionalLight, PointLight, PointLightHelper, Raycaster, Vector2 } from "three";
-import { Scene } from "./Scene";
-import type { App } from "../App";
+import { gsap } from "gsap/all";
+import { AmbientLight, Color, DirectionalLight, Group, Object3D, PointLight, Raycaster, Vector2, Vector3 } from "three";
 import { getDefaultTicker } from "~/libraries/Ticker";
 import { expDecay } from "~/libraries/maths/Utils";
+import type { App } from "../App";
 import { CursorMode } from "../core/Input";
-import { gsap } from "gsap/all";
+import { Scene } from "./Scene";
 
 type Item = {
     continent: string;
@@ -20,12 +19,15 @@ type Item = {
 export class Olympics extends Scene {
     raycaster: Raycaster;
     pointer: Vector2;
-    light: PointLight | undefined;
-    logo: Object3D | undefined;
+    light: PointLight | null = null;
+    logo: Object3D | null = null;
     items: Item[];
     activeItem: Item | null;
     focusItem: Item | null;
     pointerFocus: Vector2;
+    medals: Object3D | null = null;
+    medalsPosition: Vector3;
+    config: { medals: { positions: { from: Vector3; to: Vector3 } } };
 
     constructor(app: App) {
         super(app);
@@ -84,33 +86,56 @@ export class Olympics extends Scene {
         this.activeItem = null;
         this.focusItem = null;
 
+        this.config = {
+            medals: {
+                positions: {
+                    from: new Vector3(0, -3.5, 0),
+                    to: new Vector3(0, 0, 0),
+                },
+            },
+        };
+
+        this.medalsPosition = new Vector3().copy(this.config.medals.positions.from);
+
         this.raycaster = new Raycaster();
     }
 
     override ready() {
         this.logo = this.app.modules.assets!.assets.models.olympics.clone();
+        this.medals = this.app.modules.assets!.assets.models.medals.clone();
 
-        const light = new AmbientLight(0xffffff, 3);
-        const light2 = new DirectionalLight(0x9f9f9f, 4);
-        const light3 = new PointLight(0xeeeeee, 2, 2);
-        const light4 = new PointLight(0xffffff, 2);
-        const light5 = new PointLight(0xffffff, 2);
-        this.light = light3;
+        this.medals.children.forEach((obj, i) => {
+            obj.position.x = -(this.app.modules.assets!.assets.models.medals.children.length - 1) * 0.5 + i;
+
+            obj.children.forEach((child) => {
+                if (child.name.startsWith("Medal")) {
+                    child.material.envMap = this.app.modules.assets!.assets.envMap.default;
+                }
+            });
+        });
+
+        const light = new AmbientLight(0xffffff, 2);
+        const light2 = new DirectionalLight(0x9f9f9f, 3);
+        const light4 = new PointLight(0xffffff, 1.5);
+        const light5 = new PointLight(0xffffff, 1.5);
+
+        this.light = new PointLight(0xeeeeee, 2, 2);
+
         light.position.z = 5;
         light2.position.z = 5;
-        light3.position.z = 0.5;
         light4.position.z = 1;
         light4.position.x = -1.5;
         light5.position.z = 1;
         light5.position.x = 1.5;
+        this.light.position.z = 0.5;
 
         this.instance.add(light);
         this.instance.add(light2);
-        this.instance.add(light3);
         this.instance.add(light4);
         this.instance.add(light5);
-        // this.instance.add(lightHelper);
+        this.instance.add(this.light);
         this.instance.add(this.logo);
+        this.instance.add(this.medals);
 
         this.logo.children.forEach((child) => {
             const item = this.items.find((i) => i.continent === child.name);
@@ -137,7 +162,7 @@ export class Olympics extends Scene {
         });
 
         this.instance.environment = this.app.modules.assets!.assets.envMap.studio;
-        this.instance.background = new Color(0xefefef);
+        this.instance.background = new Color(0xc29cd8);
     }
 
     onClick = () => {
@@ -176,6 +201,13 @@ export class Olympics extends Scene {
 
         this.logo!.rotation.y = this.pointer.x * 0.03 * Math.PI;
         this.logo!.rotation.x = this.pointer.y * -0.03 * Math.PI;
+
+        const arPosition = this.medalsPosition.clone();
+        // console.log(arPosition.y);
+        // arPosition.multiplyScalar(1 / this.app.modules.renderer!.size.ar);
+        // console.log(arPosition.y);
+
+        this.medals?.position.copy(arPosition);
 
         // this.items.forEach((item) => {
         //     item.cylinderObject!.rotation.y = this.pointerFocus.x * -0.03 * Math.PI;
@@ -278,6 +310,7 @@ export class Olympics extends Scene {
                 this.logo!.position,
                 {
                     y: 0,
+                    z: 0,
                     ease: "expo.inOut",
                     duration: 1.2,
                 },
@@ -295,6 +328,8 @@ export class Olympics extends Scene {
                 },
                 "<",
             );
+
+            tl.add(this.hideMedals(), "<");
         }
 
         if (this.focusItem) {
@@ -308,34 +343,23 @@ export class Olympics extends Scene {
                 { renderOrder: 0 },
             );
 
-            tl.to(
-                otherItems.map((i) => i.cylinderObject!.material),
-                { opacity: 0, ease: "power3.in", duration: 0.6 },
-            );
+            // tl.to(
+            //     otherItems.map((i) => i.cylinderObject!.material),
+            //     { opacity: 0, ease: "power3.in", duration: 0.6 },
+            // );
 
-            tl.to(this.focusItem.object!.position, {
-                x: -this.focusItem.cylinderObject!.position.x,
-                y: -this.focusItem.cylinderObject!.position.y,
-                ease: "expo.inOut",
-                duration: 1.2,
-            });
+            // tl.to(this.focusItem.object!.position, {
+            //     x: -this.focusItem.cylinderObject!.position.x,
+            //     y: -this.focusItem.cylinderObject!.position.y,
+            //     ease: "expo.inOut",
+            //     duration: 1.2,
+            // });
 
             tl.to(
                 this.logo!.position,
                 {
-                    y: 1.8 * (1 / this.app.modules.renderer!.size.ar),
-                    ease: "expo.inOut",
-                    duration: 1.2,
-                },
-                "<",
-            );
-
-            tl.to(
-                this.logo!.scale,
-                {
-                    x: 0.5,
-                    y: 0.5,
-                    z: 0.5,
+                    z: -2,
+                    y: 2.5 * (1 / this.app.modules.renderer!.size.ar),
                     ease: "expo.inOut",
                     duration: 1.2,
                 },
@@ -343,20 +367,84 @@ export class Olympics extends Scene {
             );
 
             // tl.to(
-            //     this.focusItem.object!.rotation,
+            //     this.logo!.scale,
             //     {
-            //         y: Math.PI * 0.2,
+            //         x: 0.5,
+            //         y: 0.5,
+            //         z: 0.5,
             //         ease: "expo.inOut",
             //         duration: 1.2,
             //     },
             //     "<",
             // );
+
+            tl.add(this.showMedals(), "<1");
         } else {
             gsap.to(
                 this.items.map((i) => i.cylinderObject!.material),
                 { opacity: 1, delay: previousItem ? 1 : 0 },
             );
         }
+    }
+
+    showMedals() {
+        const tl = gsap.timeline();
+
+        tl.fromTo(
+            this.medals!.children.map((c) => c.position),
+            {
+                y: 0,
+            },
+            {
+                y: this.config.medals.positions.from.y * -1,
+                stagger: 0.2,
+                ease: "power4.out",
+                duration: 2,
+            },
+        );
+
+        tl.fromTo(
+            this.medals!.children.map((c) => c.rotation),
+            {
+                y: 0,
+            },
+            {
+                y: Math.PI * 2,
+                stagger: 0.2,
+                ease: "power4.out",
+                duration: 2,
+            },
+            "<",
+        );
+
+        return tl;
+    }
+
+    hideMedals() {
+        const tl = gsap.timeline();
+
+        tl.to(
+            this.medals!.children.map((c) => c.position),
+            {
+                y: 0,
+                stagger: 0.2,
+                ease: "power2.in",
+                duration: 1,
+            },
+        );
+
+        tl.to(
+            this.medals!.children.map((c) => c.rotation),
+            {
+                y: 0,
+                stagger: 0.2,
+                ease: "power2.in",
+                duration: 1,
+            },
+            "<",
+        );
+
+        return tl;
     }
 
     override mounted() {

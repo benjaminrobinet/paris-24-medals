@@ -56,10 +56,8 @@
 </template>
 
 <script setup lang="ts">
-import { gsap, DrawSVGPlugin } from "gsap/all";
+import { gsap } from "gsap/all";
 const svgEl = ref<SVGElement | null>(null);
-
-gsap.registerPlugin(DrawSVGPlugin);
 
 const focus = (e: MouseEvent) => {
     const tl = gsap.timeline();
