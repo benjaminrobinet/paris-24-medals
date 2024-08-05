@@ -72,8 +72,8 @@ export class Renderer extends CoreModule {
         this.bloom = new BloomEffect({ intensity: 0.2, resolutionX: 1024, resolutionY: 1024 });
         this.dof = new DepthOfFieldEffect(this.camera, {
             focusDistance: 0.0,
-            focalLength: 0.048,
-            bokehScale: 2.0,
+            focalLength: 0.025,
+            bokehScale: 5.0,
         });
 
         this.vignette = new VignetteEffect({
@@ -114,7 +114,7 @@ export class Renderer extends CoreModule {
         this.vignette.setSize(this.size.width * this.size.dpr, this.size.height * this.size.dpr);
         this.toneMapping.setSize(this.size.width * this.size.dpr, this.size.height * this.size.dpr);
 
-        this.camera.position.z = this.size.ar > 1 ? 5 / this.size.ar : 5;
+        this.camera.position.z = this.size.ar > 1 ? 4 / this.size.ar : 4;
         this.camera.aspect = this.app.el!.offsetWidth / this.app.el!.offsetHeight;
         this.camera.updateProjectionMatrix();
     };

@@ -3,13 +3,27 @@
         <div class="intro" v-if="visible">
             <div class="logo">
                 <svg ref="svgEl" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 636.3 293.9">
-                    <g class="logo">
+                    <defs>
+                        <linearGradient id="gradient" x1="0" x2="1" y1="0" y2="1">
+                            <stop offset="0%" stop-color="#331362" stop-opacity="0.5" />
+                            <stop offset="100%" stop-color="#7d84c2" stop-opacity="0.5" />
+                        </linearGradient>
+                        <mask id="shapeMask">
+                            <circle cx="100.45" cy="100.45" r="91.6" fill="none" stroke="white" stroke-width="17.7" />
+                            <circle cx="318.15" cy="100.45" r="91.6" fill="none" stroke="white" stroke-width="17.7" />
+                            <circle cx="535.85" cy="100.45" r="91.6" fill="none" stroke="white" stroke-width="17.7" />
+                            <circle cx="209.35" cy="193.45" r="91.6" fill="none" stroke="white" stroke-width="17.7" />
+                            <circle cx="426.95" cy="193.45" r="91.6" fill="none" stroke="white" stroke-width="17.7" />
+                        </mask>
+                    </defs>
+                    <rect x="0" y="0" width="636.3" height="293.9" fill="url(#gradient)" mask="url(#shapeMask)" />
+                    <!-- <g class="logo">
                         <circle cx="100.45" cy="100.45" r="91.6" fill="none" stroke="white" stroke-width="17.7" />
                         <circle cx="318.15" cy="100.45" r="91.6" fill="none" stroke="white" stroke-width="17.7" />
                         <circle cx="535.85" cy="100.45" r="91.6" fill="none" stroke="white" stroke-width="17.7" />
                         <circle cx="209.35" cy="193.45" r="91.6" fill="none" stroke="white" stroke-width="17.7" />
                         <circle cx="426.95" cy="193.45" r="91.6" fill="none" stroke="white" stroke-width="17.7" />
-                    </g>
+                    </g> -->
                 </svg>
             </div>
         </div>
@@ -91,7 +105,7 @@ onMounted(() => {
     left: 0;
     width: 100%;
     height: 100%;
-    background: black;
+    background: white;
     clip-path: inset(0% 0% 0% 0%);
 
     .logo {

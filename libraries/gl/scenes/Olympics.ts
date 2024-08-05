@@ -27,7 +27,8 @@ export class Olympics extends Scene {
     pointerFocus: Vector2;
     medals: Object3D | null = null;
     medalsPosition: Vector3;
-    config: { medals: { positions: { from: Vector3; to: Vector3 } } };
+    config: { colors: { pick: Color; focus: Color }; medals: { positions: { from: Vector3; to: Vector3 } } };
+    medalItems: { name: string; object: Object3D }[];
 
     constructor(app: App) {
         super(app);
@@ -83,10 +84,29 @@ export class Olympics extends Scene {
             },
         ];
 
+        this.medalItems = [
+            {
+                name: "Gold",
+                object: null,
+            },
+            {
+                name: "Silver",
+                object: null,
+            },
+            {
+                name: "Bronze",
+                object: null,
+            },
+        ];
+
         this.activeItem = null;
         this.focusItem = null;
 
         this.config = {
+            colors: {
+                pick: new Color(0xc29cd8).convertLinearToSRGB(),
+                focus: new Color(0x0a050c).convertLinearToSRGB(),
+            },
             medals: {
                 positions: {
                     from: new Vector3(0, -3.5, 0),
@@ -101,11 +121,28 @@ export class Olympics extends Scene {
     }
 
     override ready() {
+        this.instance.environment = this.app.modules.assets!.assets.envMap.studio;
+        this.instance.background = new Color(this.config.colors.pick);
+
         this.logo = this.app.modules.assets!.assets.models.olympics.clone();
         this.medals = this.app.modules.assets!.assets.models.medals.clone();
 
+        this.medals!.position.copy(this.config.medals.positions.from);
+
         this.medals.children.forEach((obj, i) => {
-            obj.position.x = -(this.app.modules.assets!.assets.models.medals.children.length - 1) * 0.5 + i;
+            const item = this.medalItems.find((i) => i.name === obj.name);
+            item!.object = obj;
+
+            switch (obj.name) {
+                case "Silver":
+                    obj.position.x = -1;
+                    obj.position.y = -0.2;
+                    break;
+                case "Bronze":
+                    obj.position.x = 1;
+                    obj.position.y = -0.2;
+                    break;
+            }
 
             obj.children.forEach((child) => {
                 if (child.name.startsWith("Medal")) {
@@ -155,14 +192,9 @@ export class Olympics extends Scene {
                     item.cylinderObject.material.transparent = true;
                     item.cylinderObject.material.roughness = 0.685;
                     item.cylinderObject.material.color.copy(item.color);
-
-                    // item.cylinderWrapperObject.add(item.cylinderObject);
                 }
             });
         });
-
-        this.instance.environment = this.app.modules.assets!.assets.envMap.studio;
-        this.instance.background = new Color(0xc29cd8);
     }
 
     onClick = () => {
@@ -201,18 +233,6 @@ export class Olympics extends Scene {
 
         this.logo!.rotation.y = this.pointer.x * 0.03 * Math.PI;
         this.logo!.rotation.x = this.pointer.y * -0.03 * Math.PI;
-
-        const arPosition = this.medalsPosition.clone();
-        // console.log(arPosition.y);
-        // arPosition.multiplyScalar(1 / this.app.modules.renderer!.size.ar);
-        // console.log(arPosition.y);
-
-        this.medals?.position.copy(arPosition);
-
-        // this.items.forEach((item) => {
-        //     item.cylinderObject!.rotation.y = this.pointerFocus.x * -0.03 * Math.PI;
-        //     item.cylinderObject!.rotation.x = this.pointerFocus.y * 0.03 * Math.PI;
-        // });
     };
 
     onMove = () => {
@@ -299,12 +319,18 @@ export class Olympics extends Scene {
         if (previousItem) {
             const tl = gsap.timeline();
 
-            tl.to(previousItem.object!.position, {
-                x: 0,
-                y: 0,
-                ease: "expo.inOut",
-                duration: 1.2,
-            });
+            tl.add(this.hideMedals(), 0);
+
+            tl.to(
+                previousItem.object!.position,
+                {
+                    x: 0,
+                    y: 0,
+                    ease: "expo.inOut",
+                    duration: 1.2,
+                },
+                0,
+            );
 
             tl.to(
                 this.logo!.position,
@@ -328,8 +354,6 @@ export class Olympics extends Scene {
                 },
                 "<",
             );
-
-            tl.add(this.hideMedals(), "<");
         }
 
         if (this.focusItem) {
@@ -338,22 +362,23 @@ export class Olympics extends Scene {
             const otherItems = this.items.filter((i) => i !== this.focusItem);
 
             this.focusItem!.cylinderObject!.renderOrder -= 1;
+
             tl.set(
                 otherItems.map((i) => i.cylinderObject),
                 { renderOrder: 0 },
             );
 
-            // tl.to(
-            //     otherItems.map((i) => i.cylinderObject!.material),
-            //     { opacity: 0, ease: "power3.in", duration: 0.6 },
-            // );
+            tl.add(this.showMedals(), 0);
 
-            // tl.to(this.focusItem.object!.position, {
-            //     x: -this.focusItem.cylinderObject!.position.x,
-            //     y: -this.focusItem.cylinderObject!.position.y,
-            //     ease: "expo.inOut",
-            //     duration: 1.2,
-            // });
+            tl.to(
+                this.instance.background,
+                {
+                    r: this.config.colors.focus.r,
+                    g: this.config.colors.focus.g,
+                    b: this.config.colors.focus.b,
+                },
+                0,
+            );
 
             tl.to(
                 this.logo!.position,
@@ -377,8 +402,6 @@ export class Olympics extends Scene {
             //     },
             //     "<",
             // );
-
-            tl.add(this.showMedals(), "<1");
         } else {
             gsap.to(
                 this.items.map((i) => i.cylinderObject!.material),
@@ -391,30 +414,32 @@ export class Olympics extends Scene {
         const tl = gsap.timeline();
 
         tl.fromTo(
-            this.medals!.children.map((c) => c.position),
+            [...this.medalItems.map((i) => i.object.rotation)].reverse(),
             {
-                y: 0,
-            },
-            {
-                y: this.config.medals.positions.from.y * -1,
-                stagger: 0.2,
-                ease: "power4.out",
-                duration: 2,
-            },
-        );
-
-        tl.fromTo(
-            this.medals!.children.map((c) => c.rotation),
-            {
-                y: 0,
+                y: Math.PI,
             },
             {
                 y: Math.PI * 2,
-                stagger: 0.2,
-                ease: "power4.out",
+                stagger: 0.15,
+                ease: "power4.inOut",
                 duration: 2,
+                overwrite: "auto",
             },
             "<",
+        );
+
+        tl.to(
+            this.medals!.position,
+            {
+                x: this.config.medals.positions.to.x,
+                y: this.config.medals.positions.to.y,
+                z: this.config.medals.positions.to.z,
+                stagger: 0.2,
+                ease: "power4.out",
+                duration: 2.5,
+                overwrite: "auto",
+            },
+            0.2,
         );
 
         return tl;
@@ -423,23 +448,33 @@ export class Olympics extends Scene {
     hideMedals() {
         const tl = gsap.timeline();
 
+        tl.to(this.instance.background, {
+            r: this.config.colors.pick.r,
+            g: this.config.colors.pick.g,
+            b: this.config.colors.pick.b,
+        });
+
         tl.to(
-            this.medals!.children.map((c) => c.position),
+            this.medals!.position,
             {
-                y: 0,
-                stagger: 0.2,
+                x: this.config.medals.positions.from.x,
+                y: this.config.medals.positions.from.y,
+                z: this.config.medals.positions.from.z,
                 ease: "power2.in",
-                duration: 1,
+                duration: 0.8,
+                overwrite: "auto",
             },
+            "<",
         );
 
         tl.to(
-            this.medals!.children.map((c) => c.rotation),
+            this.medalItems.map((item) => item.object!.rotation),
             {
                 y: 0,
-                stagger: 0.2,
+                stagger: 0.1,
                 ease: "power2.in",
-                duration: 1,
+                duration: 0.8,
+                overwrite: "auto",
             },
             "<",
         );
