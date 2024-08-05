@@ -202,7 +202,7 @@ export class Olympics extends Scene {
 
         const intersects = this.raycaster.intersectObjects(this.items.map((item) => item.object!).flat());
 
-        if (intersects.length) {
+        if (intersects.length && !this.focusItem) {
             const item = this.items.find((item) => item.object === intersects[0].object.parent);
 
             if (item) {
@@ -240,7 +240,13 @@ export class Olympics extends Scene {
 
         const intersects = this.raycaster.intersectObjects(this.items.map((item) => item.object!).flat());
 
-        this.app.modules.input!.cursor = CursorMode.DEFAULT;
+        if (this.focusItem) {
+            this.app.modules.input!.cursor = CursorMode.POINTER;
+        } else {
+            this.app.modules.input!.cursor = CursorMode.DEFAULT;
+        }
+
+        if (this.focusItem) return;
 
         if (intersects.length) {
             const item = this.items.find((item) => item.object === intersects[0].object.parent);
@@ -255,7 +261,6 @@ export class Olympics extends Scene {
     };
 
     setActiveItem(item: Item | null) {
-        if (this.focusItem) return;
         if (this.activeItem === item) return;
         const previousItem = this.activeItem;
         this.activeItem = item;
@@ -384,7 +389,7 @@ export class Olympics extends Scene {
                 this.logo!.position,
                 {
                     z: -2,
-                    y: 2.5 * (1 / this.app.modules.renderer!.size.ar),
+                    y: 0.5,
                     ease: "expo.inOut",
                     duration: 1.2,
                 },
