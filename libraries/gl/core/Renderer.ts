@@ -108,6 +108,7 @@ export class Renderer extends CoreModule {
         this.instance.setSize(this.size.width, this.size.height);
 
         this.composer.setSize(this.size.width, this.size.height);
+        this.chromaticAberration.setSize(this.size.width * this.size.dpr, this.size.height * this.size.dpr);
         this.smaa.setSize(this.size.width * this.size.dpr, this.size.height * this.size.dpr);
         this.dof.setSize(this.size.width * this.size.dpr, this.size.height * this.size.dpr);
         this.bloom.setSize(this.size.width * this.size.dpr, this.size.height * this.size.dpr);
