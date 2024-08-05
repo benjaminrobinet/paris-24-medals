@@ -1,4 +1,4 @@
-import { BoxGeometry, Color, Mesh, MeshBasicMaterial, PerspectiveCamera, Scene, ShaderMaterial, SRGBColorSpace, Vector3, WebGLRenderer } from "three";
+import { BoxGeometry, Color, Mesh, MeshBasicMaterial, PerspectiveCamera, Scene, SRGBColorSpace, Vector3, WebGLRenderer } from "three";
 import { CoreModule } from "./CoreModule";
 import { getDefaultViewport, type ViewportHandler } from "~/libraries/Viewport";
 import {
@@ -12,7 +12,6 @@ import {
     ToneMappingMode,
     DepthOfFieldEffect,
     VignetteEffect,
-    BlendFunction,
     SMAAPreset,
     EdgeDetectionMode,
 } from "postprocessing";
@@ -49,12 +48,10 @@ export class Renderer extends CoreModule {
             canvas: this.app.el!,
         });
 
-        this.instance.setClearColor(0x000000, 1);
-
         this.instance.outputColorSpace = SRGBColorSpace;
 
-        this.camera = new PerspectiveCamera(50, 1, 0.1, 100);
-        this.camera.position.z = 3.5;
+        this.camera = new PerspectiveCamera(50, 1, 1, 100);
+        this.camera.position.z = 5;
         this.scene = new Scene();
 
         this.size = { width: window.innerWidth, height: window.innerHeight, ar: window.innerWidth / window.innerHeight, dpr: window.devicePixelRatio };
@@ -69,17 +66,20 @@ export class Renderer extends CoreModule {
             preset: SMAAPreset.HIGH,
             edgeDetectionMode: EdgeDetectionMode.COLOR,
         });
+
         this.chromaticAberration = new ChromaticAberrationEffect();
         this.toneMapping = new ToneMappingEffect({ mode: ToneMappingMode.ACES_FILMIC });
-        this.bloom = new BloomEffect({ intensity: 0.2 });
+        this.bloom = new BloomEffect({ intensity: 0.2, resolutionX: 1024, resolutionY: 1024 });
         this.dof = new DepthOfFieldEffect(this.camera, {
             focusDistance: 0.0,
             focalLength: 0.048,
             bokehScale: 2.0,
-            height: 480,
+            resolutionX: window.window.innerWidth,
+            resolutionY: window.innerHeight,
         });
+
         this.vignette = new VignetteEffect({
-            darkness: 0.3,
+            darkness: 0.5,
             offset: 0.5,
         });
 
@@ -94,7 +94,7 @@ export class Renderer extends CoreModule {
         this.composer = new EffectComposer(this.instance);
         this.composer.addPass(this.renderPass);
         this.composer.addPass(new EffectPass(this.camera, this.dof));
-        this.composer.addPass(new EffectPass(this.camera, this.chromaticAberration));
+        // this.composer.addPass(new EffectPass(this.camera, this.chromaticAberration));
         this.composer.addPass(new EffectPass(this.camera, this.bloom));
         this.composer.addPass(new EffectPass(this.camera, this.vignette));
         this.composer.addPass(new EffectPass(this.camera, this.toneMapping));
@@ -109,9 +109,9 @@ export class Renderer extends CoreModule {
 
         this.instance.setSize(this.size.width, this.size.height);
         this.composer.setSize(this.size.width, this.size.height);
-        this.smaa.setSize(this.size.width * this.size.dpr, this.size.height * this.size.dpr);
+        this.smaa.setSize(this.size.width, this.size.height);
 
-        this.camera.position.z = 3.5 * (1 / this.size.ar);
+        this.camera.position.z = 5 * (1 / this.size.ar);
         this.camera.aspect = this.app.el!.offsetWidth / this.app.el!.offsetHeight;
         this.camera.updateProjectionMatrix();
     };

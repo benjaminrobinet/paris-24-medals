@@ -62,7 +62,6 @@ onMounted(() => {
     const viewBox = { width: 636.3, height: 293.9 };
 
     const circles = svgEl.value!.querySelectorAll("circle");
-    visible.value = false;
 
     tl.set(svgEl.value, { opacity: 1 });
 
@@ -92,7 +91,7 @@ onMounted(() => {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, #331362, #7d84c2);
+    background: black;
     clip-path: inset(0% 0% 0% 0%);
 
     .logo {

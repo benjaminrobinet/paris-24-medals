@@ -60,6 +60,8 @@ export class App {
         await Promise.all(Object.values(this.modules).map((module) => module!.ready?.()));
         await Promise.all(Object.values(this.scenes).map((scene) => scene!.ready?.()));
 
+        this.modules.debug.setup();
+
         this.scenes.olympics.enter();
         this.activeScene = this.scenes.olympics;
     }

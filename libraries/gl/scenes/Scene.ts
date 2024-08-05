@@ -14,7 +14,7 @@ export abstract class Scene extends CoreModule {
     }
 
     override init(): Promise<unknown> | void {
-        // this.app.modules.renderer!.scene.add(this.instance);
+        this.app.modules.renderer!.scene.add(this.instance);
     }
 
     enter() {

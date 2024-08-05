@@ -5,6 +5,7 @@ import { getDefaultTicker, type TickerHandler } from "~/libraries/Ticker";
 import { OrbitControls } from "three/examples/jsm/Addons.js";
 import { Pane } from "tweakpane";
 import type { BindingApi } from "@tweakpane/core";
+import { metalness, roughness } from "three/webgpu";
 
 export class Debug extends CoreModule {
     controls: OrbitControls;
@@ -25,6 +26,21 @@ export class Debug extends CoreModule {
         this.toUpdates.push(this.pane.addBinding(this.app.modules.renderer!.dof.cocMaterial, "focusDistance", { min: 0, max: 1, step: 0.001 }));
         this.pane.addBinding(this.app.modules.renderer!.dof.cocMaterial, "focalLength", { min: 0, max: 1, step: 0.001 });
         this.pane.addBinding(this.app.modules.renderer!.dof, "bokehScale", { min: 0, max: 5, step: 0.001 });
+        this.pane
+            .addBinding({ metalness: this.app.scenes.olympics.items[0].cylinderObject.material.metalness }, "metalness", { min: 0, max: 1, step: 0.001 })
+            .on("change", (ev) => {
+                this.app.scenes.olympics.items.forEach((item) => (item.cylinderObject.material.metalness = ev.value));
+            });
+
+        this.pane
+            .addBinding({ roughness: this.app.scenes.olympics.items[0].cylinderObject.material.roughness }, "roughness", { min: 0, max: 1, step: 0.001 })
+            .on("change", (ev) => {
+                this.app.scenes.olympics.items.forEach((item) => (item.cylinderObject.material.roughness = ev.value));
+            });
+
+        this.app.scenes.olympics.items.forEach((item) => {
+            this.pane.addBinding(item.cylinderObject.material, "color", { min: 0, max: 5, step: 0.001, color: { type: "float" } });
+        });
     }
 
     onResize: ViewportHandler = () => {};
@@ -47,7 +63,7 @@ export class Debug extends CoreModule {
         ticker.add(this.onFrame);
     }
 
-    override ready(): Promise<unknown> | void {
+    setup() {
         this.createPane();
     }
 
