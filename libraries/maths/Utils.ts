@@ -2,6 +2,10 @@ export const lerp = (a: number, b: number, alpha: number) => {
     return a + alpha * (b - a);
 };
 
+export const expDecay = (a: number, b: number, decay: number, dt: number) => {
+    return b + (a - b) * Math.exp(-decay * dt);
+};
+
 /** @see https://stackoverflow.com/a/67219519 **/
 export const rLerp = (start: number, end: number, alpha: number) => {
     const CS = lerp(Math.cos(start), Math.cos(end), alpha);

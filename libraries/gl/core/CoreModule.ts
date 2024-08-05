@@ -1,9 +1,11 @@
+import EventEmitter from "~/libraries/utils/EventEmitter";
 import type { App } from "../App";
 
-export abstract class CoreModule {
+export abstract class CoreModule extends EventEmitter {
     app: App;
 
     constructor(app: App) {
+        super();
         this.app = app;
     }
 

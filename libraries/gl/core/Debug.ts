@@ -4,10 +4,12 @@ import type { App } from "../App";
 import { getDefaultTicker, type TickerHandler } from "~/libraries/Ticker";
 import { OrbitControls } from "three/examples/jsm/Addons.js";
 import { Pane } from "tweakpane";
+import type { BindingApi } from "@tweakpane/core";
 
 export class Debug extends CoreModule {
     controls: OrbitControls;
     pane: Pane;
+    toUpdates: BindingApi[] = [];
 
     constructor(app: App) {
         super(app);
@@ -20,7 +22,7 @@ export class Debug extends CoreModule {
     }
 
     createPane() {
-        this.pane.addBinding(this.app.modules.renderer!.dof.cocMaterial, "focusDistance", { min: 0, max: 1, step: 0.001 });
+        this.toUpdates.push(this.pane.addBinding(this.app.modules.renderer!.dof.cocMaterial, "focusDistance", { min: 0, max: 1, step: 0.001 }));
         this.pane.addBinding(this.app.modules.renderer!.dof.cocMaterial, "focalLength", { min: 0, max: 1, step: 0.001 });
         this.pane.addBinding(this.app.modules.renderer!.dof, "bokehScale", { min: 0, max: 5, step: 0.001 });
     }
@@ -28,6 +30,10 @@ export class Debug extends CoreModule {
     onResize: ViewportHandler = () => {};
 
     onFrame: TickerHandler = ({ dt }) => {
+        this.toUpdates.forEach((toUpdate) => {
+            toUpdate.refresh();
+        });
+
         this.controls.update(dt);
     };
 

@@ -1,10 +1,20 @@
-import { Scene as ThreeScene } from "three";
+import { PerspectiveCamera, Scene as ThreeScene } from "three";
+import type { App } from "../App";
+import { CoreModule } from "../core/CoreModule";
 
-export abstract class Scene {
+export abstract class Scene extends CoreModule {
     instance: ThreeScene;
+    camera: PerspectiveCamera;
 
-    constructor() {
+    constructor(app: App) {
+        super(app);
         this.instance = new ThreeScene();
+        this.camera = new PerspectiveCamera();
+        this.instance.visible = false;
+    }
+
+    override init(): Promise<unknown> | void {
+        // this.app.modules.renderer!.scene.add(this.instance);
     }
 
     enter() {

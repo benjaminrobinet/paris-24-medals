@@ -30,7 +30,11 @@ onMounted(() => {
 }
 
 .svg-wrapper {
+    position: absolute;
+    inset: 0;
     display: flex;
-    overflow: auto;
+    justify-content: center;
+    align-items: center;
+    padding: 152rem;
 }
 </style>

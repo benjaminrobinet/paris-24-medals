@@ -4,6 +4,11 @@
             "type": "gltf",
             "key": "medals",
             "src": "/static/medals-compress.glb"
+        },
+        {
+            "type": "gltf",
+            "key": "olympics",
+            "src": "/static/olympics-exp-compress.glb"
         }
     ]
 }
