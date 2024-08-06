@@ -418,18 +418,6 @@ export class Olympics extends Scene {
                 },
                 "<",
             );
-
-            // tl.to(
-            //     this.logo!.scale,
-            //     {
-            //         x: 0.5,
-            //         y: 0.5,
-            //         z: 0.5,
-            //         ease: "expo.inOut",
-            //         duration: 1.2,
-            //     },
-            //     "<",
-            // );
         } else {
             gsap.to(
                 this.items.map((i) => i.cylinderObject!.material),

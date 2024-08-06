@@ -43,7 +43,9 @@ export class Debug extends CoreModule {
             });
 
         this.app.scenes.olympics.items.forEach((item) => {
-            this.pane.addBinding(item.cylinderObject.material, "color", { min: 0, max: 5, step: 0.001, color: { type: "float" } });
+            this.pane.addBinding(item, "color", { min: 0, max: 5, step: 0.001, color: { type: "float" } }).on("change", (evt) => {
+                item.cylinderObject.material.color.copy(evt.value);
+            });
         });
 
         this.pane.addBinding(this.app.scenes.olympics.instance, "background", { color: { type: "float" } });
@@ -79,7 +81,6 @@ export class Debug extends CoreModule {
     }
 
     onKeyUp = (e: KeyboardEvent) => {
-        console.log(e.key);
         if (e.key === "d") {
             if (!this.enabled) {
                 this.enable();
