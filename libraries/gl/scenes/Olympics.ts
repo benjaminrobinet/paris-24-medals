@@ -287,9 +287,9 @@ export class Olympics extends Scene {
                 r: previousItem.color.r,
                 g: previousItem.color.g,
                 b: previousItem.color.b,
-                ease: "power3.out",
-                duration: 0.5,
-                overwrite: true,
+                ease: "power2.out",
+                duration: 0.4,
+                overwrite: "auto",
             });
         }
 
@@ -302,7 +302,7 @@ export class Olympics extends Scene {
                 g: this.activeItem.color.g,
                 b: this.activeItem.color.b,
                 ease: "power2.out",
-                duration: 0.6,
+                duration: 0.4,
             });
 
             gsap.to(
@@ -311,7 +311,7 @@ export class Olympics extends Scene {
                     r: white.r,
                     g: white.g,
                     b: white.b,
-                    ease: "power1.out",
+                    ease: "power2.out",
                     duration: 0.4,
                     overwrite: "auto",
                 },
