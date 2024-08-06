@@ -13,10 +13,6 @@ import countryMedals from "~/resources/mocks/get-medals-by-country.json";
 const { data } = useAsyncData("medals", async () => {
     return await splitByContinent(countryMedals);
 });
-
-onMounted(() => {
-    console.log(data);
-});
 </script>
 
 <style scoped lang="scss">

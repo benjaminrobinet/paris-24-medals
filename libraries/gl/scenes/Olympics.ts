@@ -1,6 +1,6 @@
 import { gsap } from "gsap/all";
-import { AmbientLight, Color, DirectionalLight, Group, Object3D, PointLight, Raycaster, Vector2, Vector3 } from "three";
-import { getDefaultTicker } from "~/libraries/Ticker";
+import { AmbientLight, Color, DirectionalLight, Group, MeshPhysicalMaterial, Object3D, PointLight, Raycaster, Vector2, Vector3 } from "three";
+import { getDefaultTicker, type TickerHandler } from "~/libraries/Ticker";
 import { expDecay } from "~/libraries/maths/Utils";
 import type { App } from "../App";
 import { CursorMode } from "../core/Input";
@@ -28,7 +28,7 @@ export class Olympics extends Scene {
     medals: Object3D | null = null;
     medalsPosition: Vector3;
     config: { colors: { pick: Color; focus: Color }; medals: { positions: { from: Vector3; to: Vector3 } } };
-    medalItems: { name: string; object: Object3D }[];
+    medalItems: { name: string; wrapper: Object3D | null; object: Object3D | null; text: Object3D | null }[];
 
     constructor(app: App) {
         super(app);
@@ -87,15 +87,21 @@ export class Olympics extends Scene {
         this.medalItems = [
             {
                 name: "Gold",
+                wrapper: null,
                 object: null,
+                text: null,
             },
             {
                 name: "Silver",
+                wrapper: null,
                 object: null,
+                text: null,
             },
             {
                 name: "Bronze",
+                wrapper: null,
                 object: null,
+                text: null,
             },
         ];
 
@@ -129,7 +135,7 @@ export class Olympics extends Scene {
 
         this.medals!.position.copy(this.config.medals.positions.from);
 
-        this.medals.children.forEach((obj, i) => {
+        this.medals.children.forEach((obj) => {
             const item = this.medalItems.find((i) => i.name === obj.name);
             item!.object = obj;
 
@@ -144,9 +150,18 @@ export class Olympics extends Scene {
                     break;
             }
 
-            obj.children.forEach((child) => {
+            obj.traverse((child) => {
                 if (child.name.startsWith("Medal")) {
                     child.material.envMap = this.app.modules.assets!.assets.envMap.default;
+                }
+
+                if (child.name.startsWith("Text")) {
+                    item!.text = child;
+                    item!.text.visible = false;
+                }
+
+                if (child.name.startsWith("Wrapper")) {
+                    item!.wrapper = child;
                 }
             });
         });
@@ -190,10 +205,21 @@ export class Olympics extends Scene {
                 if (sChild.name.startsWith("Cylinder")) {
                     item.cylinderObject = sChild;
                     item.cylinderObject.material.transparent = true;
-                    item.cylinderObject.material.roughness = 0.685;
+                    item.cylinderObject.material.metalness = 0.75;
+                    item.cylinderObject.material.roughness = 0.35;
                     item.cylinderObject.material.color.copy(item.color);
                 }
             });
+        });
+
+        this.medalItems.forEach((item, i) => {
+            const tl = gsap.timeline({
+                yoyo: true,
+                repeat: -1,
+                delay: i,
+            });
+            tl.fromTo(item.wrapper!.position, { y: -0.02 }, { y: 0.02, duration: 3, ease: "power1.inOut" }, 0);
+            tl.fromTo(item.wrapper!.rotation, { x: Math.PI * 0.01 }, { x: -Math.PI * 0.01, duration: 3, ease: "power1.inOut" }, 0);
         });
     }
 
@@ -214,19 +240,8 @@ export class Olympics extends Scene {
         }
     };
 
-    onUpdate = ({ dt }) => {
+    onUpdate: TickerHandler = ({ dt }) => {
         this.light!.position.set(this.pointer.x * (1 / 0.5), this.pointer.y * (1 / 0.75), this.light!.position.z);
-
-        // if (this.focusItem) {
-        //     this.pointerFocus.x = expDecay(this.pointerFocus.x, this.app.modules.input!.pointer.x, 8, dt);
-        //     this.pointerFocus.y = expDecay(this.pointerFocus.y, this.app.modules.input!.pointer.y, 8, dt);
-
-        //     this.pointer.x = expDecay(this.pointer.x, 0, 8, dt);
-        //     this.pointer.y = expDecay(this.pointer.y, 0, 8, dt);
-        // } else {
-        //     this.pointerFocus.x = expDecay(this.pointerFocus.x, 0, 8, dt);
-        //     this.pointerFocus.y = expDecay(this.pointerFocus.y, 0, 8, dt);
-        // }
 
         this.pointer.x = expDecay(this.pointer.x, this.app.modules.input!.pointer.x, 8, dt);
         this.pointer.y = expDecay(this.pointer.y, this.app.modules.input!.pointer.y, 8, dt);
@@ -264,6 +279,8 @@ export class Olympics extends Scene {
         if (this.activeItem === item) return;
         const previousItem = this.activeItem;
         this.activeItem = item;
+
+        this.app.store.setHoverContinent(this.activeItem?.continent || null);
 
         if (previousItem) {
             gsap.to(previousItem.cylinderObject!.material.color, {
@@ -320,6 +337,8 @@ export class Olympics extends Scene {
         if (this.focusItem === item) return;
         const previousItem = this.focusItem;
         this.focusItem = item;
+
+        this.app.store.setCurrentContinent(this.focusItem?.continent || null);
 
         if (previousItem) {
             const tl = gsap.timeline();

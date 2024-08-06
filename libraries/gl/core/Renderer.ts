@@ -38,8 +38,6 @@ export class Renderer extends CoreModule {
     constructor(app: App) {
         super(app);
 
-        console.log(this.app.el);
-
         this.instance = new WebGLRenderer({
             powerPreference: "high-performance",
             antialias: false,

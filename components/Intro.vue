@@ -55,6 +55,20 @@ const onLeave = (el: HTMLElement, done: () => void) => {
     );
 
     tl.fromTo(
+        el.querySelector("svg"),
+        {
+            scale: 1,
+        },
+        {
+            scale: 0.975,
+            ease: "expo.inOut",
+            duration: 1,
+            immediateRender: false,
+        },
+        "<",
+    );
+
+    tl.fromTo(
         el,
         {
             clipPath: `inset(5% ${5 * ar}% 5% ${5 * ar}%)`,

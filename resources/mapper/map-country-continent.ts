@@ -42,34 +42,29 @@ export type CountryMedal = {
     disciplines: null;
 };
 
-const fixedMapCountryCode: Record<string, string> = {
-    NED: "NLD",
-    GER: "DEU",
-    CRO: "HRV",
-    SUI: "CHE",
-    RSA: "ZAF",
-    GUA: "GTM",
-    PHI: "PHL",
-    SLO: "SVN",
-    GRE: "GRC",
-    DEN: "DNK",
-    FIJ: "FJI",
-    MGL: "MNG",
-    TPE: "TWN",
-    GRN: "GRD",
-    POR: "PRT",
-    KOS: "XKX",
+export type CountryMedals = {
+    country: {
+        code: string;
+        iso_alpha_2: string;
+        iso_alpha_3: string;
+        name: string;
+    };
+    medals: {
+        bronze: number;
+        gold: number;
+        silver: number;
+        total: number;
+    };
+    rank: number;
 };
 
-export const splitByContinent = (medals: CountryMedal[]): ContinentMedal[] => {
+export const splitByContinent = (medals: CountryMedals[]): ContinentMedal[] => {
     return medals
         .reduce<ContinentMedal[]>((acc, medal) => {
-            const continentAttribution = countryContinentAttribution.find(
-                (country) => country.Three_Letter_Country_Code === medal.noc || country.Three_Letter_Country_Code === fixedMapCountryCode[medal.noc],
-            );
+            const continentAttribution = countryContinentAttribution.find((country) => country.Three_Letter_Country_Code === medal.country.iso_alpha_3);
 
             if (!continentAttribution) {
-                console.warn(`Continent attribution not found for ${medal.noc}`);
+                console.warn(`Continent attribution not found for ${medal.country.iso_alpha_3}`);
                 return acc;
             }
 
@@ -80,25 +75,21 @@ export const splitByContinent = (medals: CountryMedal[]): ContinentMedal[] => {
                     continentCode: continentAttribution.Continent_Code,
                     continentName: continentAttribution.Continent_Name,
 
-                    gold: medal.gold,
-                    silver: medal.silver,
-                    bronze: medal.bronze,
+                    gold: medal.medals.gold,
+                    silver: medal.medals.silver,
+                    bronze: medal.medals.bronze,
 
-                    total: medal.total,
-                    rank: 0,
+                    total: medal.medals.total,
+                    rank: medal.rank,
                 });
             } else {
-                currentContinent.gold += medal.gold;
-                currentContinent.silver += medal.silver;
-                currentContinent.bronze += medal.bronze;
-                currentContinent.total += medal.total;
+                currentContinent.gold += medal.medals.gold;
+                currentContinent.silver += medal.medals.silver;
+                currentContinent.bronze += medal.medals.bronze;
+                currentContinent.total += medal.medals.total;
             }
 
             return acc;
         }, [])
-        .sort((a, b) => b.total - a.total)
-        .map((continent, index) => ({
-            ...continent,
-            rank: index + 1,
-        }));
+        .sort((a, b) => b.total - a.total);
 };

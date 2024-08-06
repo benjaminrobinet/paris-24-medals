@@ -13,10 +13,13 @@ export class App {
     debugEnabled: boolean;
     scenes: { medals: Medals; olympics: Olympics };
     activeScene: Scene | undefined;
+    store: ReturnType<typeof useAppStore> = useAppStore();
 
     constructor() {
         this.el = null;
         this.modulesDefinition = { renderer: Renderer, assets: Assets, input: Input, debug: Debug };
+
+        this.store = useAppStore();
 
         this.modules = {
             renderer: null,
@@ -60,7 +63,9 @@ export class App {
         await Promise.all(Object.values(this.modules).map((module) => module!.ready?.()));
         await Promise.all(Object.values(this.scenes).map((scene) => scene!.ready?.()));
 
-        this.modules.debug.setup();
+        if (this.debugEnabled) {
+            this.modules.debug!.setup();
+        }
 
         this.scenes.olympics.enter();
         this.activeScene = this.scenes.olympics;
