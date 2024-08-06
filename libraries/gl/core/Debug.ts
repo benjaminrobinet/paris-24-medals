@@ -5,15 +5,17 @@ import { getDefaultTicker, type TickerHandler } from "~/libraries/Ticker";
 import { OrbitControls } from "three/examples/jsm/Addons.js";
 import { Pane } from "tweakpane";
 import type { BindingApi } from "@tweakpane/core";
-import { metalness, roughness } from "three/webgpu";
 
 export class Debug extends CoreModule {
     controls: OrbitControls;
     pane: Pane | undefined;
     toUpdates: BindingApi[] = [];
+    enabled: boolean;
 
     constructor(app: App) {
         super(app);
+
+        this.enabled = false;
 
         this.controls = new OrbitControls(this.app.modules.renderer!.camera, this.app.el!);
         this.controls.enableDamping = true;
@@ -23,6 +25,7 @@ export class Debug extends CoreModule {
 
     createPane() {
         this.pane = new Pane();
+        this.pane.hidden = !this.enabled;
 
         this.toUpdates.push(this.pane.addBinding(this.app.modules.renderer!.dof.cocMaterial, "focusDistance", { min: 0, max: 1, step: 0.001 }));
         this.pane.addBinding(this.app.modules.renderer!.dof.cocMaterial, "focalLength", { min: 0, max: 1, step: 0.001 });
@@ -59,6 +62,37 @@ export class Debug extends CoreModule {
         this.controls.update(dt);
     };
 
+    enable() {
+        if (this.enabled) return;
+        this.enabled = true;
+        if (this.pane) {
+            this.pane!.hidden = false;
+        }
+    }
+
+    disable() {
+        if (!this.enabled) return;
+        this.enabled = false;
+        if (this.pane) {
+            this.pane!.hidden = true;
+        }
+    }
+
+    onKeyUp = (e: KeyboardEvent) => {
+        console.log(e.key);
+        if (e.key === "d") {
+            if (!this.enabled) {
+                this.enable();
+            } else {
+                this.disable();
+            }
+        }
+    };
+
+    setup() {
+        this.createPane();
+    }
+
     override init() {}
 
     override mounted() {
@@ -67,10 +101,7 @@ export class Debug extends CoreModule {
 
         viewport.add(this.onResize);
         ticker.add(this.onFrame);
-    }
-
-    setup() {
-        this.createPane();
+        document.addEventListener("keyup", this.onKeyUp);
     }
 
     override destroy() {
@@ -79,7 +110,8 @@ export class Debug extends CoreModule {
 
         viewport.remove(this.onResize);
         ticker.remove(this.onFrame);
+        document.removeEventListener("keyup", this.onKeyUp);
 
-        this.pane.dispose();
+        this.pane?.dispose();
     }
 }

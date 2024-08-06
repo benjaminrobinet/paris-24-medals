@@ -32,8 +32,6 @@ export class App {
             medals: new Medals(this),
             olympics: new Olympics(this),
         };
-
-        this.debugEnabled = process.env.NODE_ENV === "development";
     }
 
     setup({ el }: { el: HTMLCanvasElement }) {
@@ -63,9 +61,7 @@ export class App {
         await Promise.all(Object.values(this.modules).map((module) => module!.ready?.()));
         await Promise.all(Object.values(this.scenes).map((scene) => scene!.ready?.()));
 
-        if (this.debugEnabled) {
-            this.modules.debug!.setup();
-        }
+        this.modules.debug!.setup();
 
         this.scenes.olympics.enter();
         this.activeScene = this.scenes.olympics;
