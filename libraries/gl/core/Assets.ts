@@ -2,11 +2,11 @@ import { CoreModule } from "./CoreModule";
 import type { App } from "../App";
 import { DRACOLoader, EXRLoader, GLTFLoader, KTX2Loader } from "three/examples/jsm/Addons.js";
 import assets from "../assets.json";
-import { AmbientLight, Color, DataTexture, DirectionalLight, EquirectangularReflectionMapping, Object3D, PointLight } from "three";
+import type { DataTexture, Object3D } from "three";
+import { EquirectangularReflectionMapping } from "three";
 
 export class Assets extends CoreModule {
     loaders: { gltf: GLTFLoader; exr: EXRLoader };
-    medals: any;
     assets: { models: { [key: string]: Object3D }; envMap: { [key: string]: DataTexture } };
 
     constructor(app: App) {
