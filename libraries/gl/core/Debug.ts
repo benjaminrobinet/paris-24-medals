@@ -9,7 +9,7 @@ import { metalness, roughness } from "three/webgpu";
 
 export class Debug extends CoreModule {
     controls: OrbitControls;
-    pane: Pane;
+    pane: Pane | undefined;
     toUpdates: BindingApi[] = [];
 
     constructor(app: App) {
@@ -18,11 +18,12 @@ export class Debug extends CoreModule {
         this.controls = new OrbitControls(this.app.modules.renderer!.camera, this.app.el!);
         this.controls.enableDamping = true;
         this.controls.dampingFactor = 0.2;
-
-        this.pane = new Pane();
+        this.controls.enabled = false;
     }
 
     createPane() {
+        this.pane = new Pane();
+
         this.toUpdates.push(this.pane.addBinding(this.app.modules.renderer!.dof.cocMaterial, "focusDistance", { min: 0, max: 1, step: 0.001 }));
         this.pane.addBinding(this.app.modules.renderer!.dof.cocMaterial, "focalLength", { min: 0, max: 1, step: 0.001 });
         this.pane.addBinding(this.app.modules.renderer!.dof, "bokehScale", { min: 0, max: 5, step: 0.001 });
@@ -43,6 +44,9 @@ export class Debug extends CoreModule {
         });
 
         this.pane.addBinding(this.app.scenes.olympics.instance, "background", { color: { type: "float" } });
+        this.pane.addBinding({ orbit: false }, "orbit").on("change", (ev) => {
+            this.controls.enabled = ev.value;
+        });
     }
 
     onResize: ViewportHandler = () => {};
